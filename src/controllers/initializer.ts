@@ -55,6 +55,8 @@ MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
 
 import * as chalk from 'chalk';
 
+import * as path from 'path';
+
 import { readFileSync } from 'fs';
 
 import { Browser, Page } from 'puppeteer';
