@@ -70,6 +70,7 @@ import { SocketState, SocketStream } from '../api/model/enum';
 import { SessionTokenCkeck, saveToken, isBeta } from './auth';
 import { initWhatsapp, initBrowser, injectApi } from './browser';
 import { welcomeScreen } from './welcome';
+const path = require('path');
 /**
  * A callback will be received, informing the status of the qrcode
  */
@@ -168,6 +169,9 @@ export async function create(
   if (!mergedOptions.disableWelcome) {
     welcomeScreen();
   }
+
+  statusFind && statusFind('initBrowser', this.session);
+
   // Initialize whatsapp
   if (mergedOptions.browserWS) {
     logger.info(`Waiting... checking the wss server...`, { session });
@@ -198,7 +202,9 @@ export async function create(
     logger.info('Has been properly connected to the wss server', {
       session
     });
+    statusFind && statusFind('connectBrowserWs', this.session);
   } else {
+    statusFind && statusFind('openBrowser', this.session);
     logger.info('Browser successfully opened', {
       session
     });
@@ -236,10 +242,12 @@ export async function create(
     if (SessionTokenCkeck(browserSessionToken)) {
       browserToken = browserSessionToken;
     }
+
     logger.info('Checking page...', {
       session
     });
 
+    statusFind && statusFind('initWhatsapp', this.session);
     // Initialize whatsapp
     const page: false | Page = await initWhatsapp(
       session,
@@ -256,9 +264,12 @@ export async function create(
       logger.info('Error accessing the page: "https://web.whatsapp.com"', {
         session
       });
+
+      statusFind && statusFind('erroPageWhatsapp', this.session);
       throw 'Error when trying to access the page: "https://web.whatsapp.com"';
     }
 
+    statusFind && statusFind('successPageWhatsapp', this.session);
     logger.info(`${chalk.green('Page successfully accessed')}`, {
       session
     });
@@ -295,19 +306,18 @@ export async function create(
 
     client.onStateChange(async (state) => {
       if (state === SocketState.PAIRING) {
-        const device = await page
-          .waitForFunction(
-            () => {
-              if (document.querySelectorAll('._2Nr6U').length) {
-                return true;
-              }
-            },
-            {
-              timeout: 0,
-              polling: 100
+        const device: Boolean = await page
+          .evaluate(() => {
+            if (
+              document.querySelector('[tabindex="-1"]') &&
+              window?.Store?.Stream?.mode == 'SYNCING' &&
+              window?.Store?.Stream?.obscurity == 'SHOW'
+            ) {
+              return true;
             }
-          )
-          .catch();
+            return false;
+          })
+          .catch(() => undefined);
         if (device) {
           const ckeckVersion = await isBeta(page);
           if (ckeckVersion === false) {
@@ -343,7 +353,10 @@ export async function create(
         console.log(`\nDebug: Option waitForLogin it's true. waiting...`);
       }
 
+      statusFind && statusFind('waitForLogin', this.session);
+
       const isLogged = await client.waitForLogin(catchQR, statusFind);
+
       if (!isLogged) {
         throw 'Not Logged';
       }
@@ -380,13 +393,19 @@ export async function create(
     }
 
     if (mergedOptions.debug) {
-      console.log(`\nDebug: Init WP app... waitForFunction "Store" ... this might take a while`);
+      console.log(
+        `\nDebug: Init WP app... waitForFunction "Store" ... this might take a while`
+      );
     }
+
+    statusFind && statusFind('waitChat', this.session);
 
     await page.waitForSelector('#app .two', { visible: true }).catch(() => {});
 
     if (mergedOptions.debug) {
-      console.log(`\nDebug: Loading wp app... waitForFunction "Store" ... this might take a while also`);
+      console.log(
+        `\nDebug: Loading wp app... waitForFunction "Store" ... this might take a while also`
+      );
     }
 
     await page
@@ -395,7 +414,14 @@ export async function create(
           if (mergedOptions.debug) {
             console.log(`\nDebug: Loading wp app....`);
           }
-          const StoreKey = Object.keys(window).find(k => window[k] && (window[k].hasOwnProperty('WidFactory')) && (window[k].WidFactory.hasOwnProperty('createWid')));
+          const StoreKey = Object.keys(window).find(
+            (k) =>
+              !!Object.getOwnPropertyDescriptor(window[k], 'WidFactory') &&
+              !!Object.getOwnPropertyDescriptor(
+                window[k].WidFactory,
+                'createWid'
+              )
+          );
           if (StoreKey) {
             window.Store = window[StoreKey];
             return true;
@@ -418,7 +444,7 @@ export async function create(
     if (mergedOptions.debug) {
       console.log(`\nDebug: injecting Api done...`);
     }
-
+    statusFind && statusFind('successChat', this.session);
     return client;
   }
 }

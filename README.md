@@ -61,7 +61,7 @@ With Superchats you can build service bots, multiservice chats or any system tha
 
 ## Buy a license Superchats
 
-The value of the license is $30 monthly dollars, to acquire contact in whatsapp by clicking on the image below !!
+The value of the license is $50 monthly dollars, to acquire contact in whatsapp by clicking on the image below !!
 
 <a target="_blank" href="https://web.whatsapp.com/send?phone=556181590153&text=I%20want%20to%20buy%201%20license" target="_blank"><img title="whatzapp" height="100" width="375" src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/WhatsApp_logo.svg/2000px-WhatsApp_logo.svg.png"></a>
 
@@ -175,7 +175,7 @@ venom
     },
     // statusFind
     (statusSession, session) => {
-      console.log('Status Session: ', statusSession); //return isLogged || notLogged || browserClose || qrReadSuccess || qrReadFail || autocloseCalled || desconnectedMobile || deleteToken || chatsAvailable || deviceNotConnected || serverWssNotConnected || noOpenBrowser
+      console.log('Status Session: ', statusSession); //return isLogged || notLogged || browserClose || qrReadSuccess || qrReadFail || autocloseCalled || desconnectedMobile || deleteToken || chatsAvailable || deviceNotConnected || serverWssNotConnected || noOpenBrowser || initBrowser || openBrowser || connectBrowserWs || initWhatsapp || erroPageWhatsapp || successPageWhatsapp || waitForLogin || waitChat || successChat
       //Create session wss return "serverClose" case server for close
       console.log('Session name: ', session);
     },
@@ -227,7 +227,7 @@ venom
 
 ## Callback Status Session
 
-Gets the return if the session is `isLogged` or `notLogged` or `browserClose` or `qrReadSuccess` or `qrReadFail` or `autocloseCalled` or `desconnectedMobile` or `deleteToken` or `chatsAvailable` or `deviceNotConnected` or `serverWssNotConnected` or `noOpenBrowser` or `Create session wss return "serverClose" case server for close`
+Gets the return if the session is `isLogged` or `notLogged` or `browserClose` or `qrReadSuccess` or `qrReadFail` or `autocloseCalled` or `desconnectedMobile` or `deleteToken` or `chatsAvailable` or `deviceNotConnected` or `serverWssNotConnected` or `noOpenBrowser` or `initBrowser` or `openBrowser` or `connectBrowserWs` or `initWhatsapp` or `erroPageWhatsapp` or `successPageWhatsapp` or `waitForLogin` or `waitChat` or `successChat` or `Create session wss return "serverClose" case server for close`
 
 | Status                  | Condition                                                                                                                                                      |
 |-------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -244,7 +244,15 @@ Gets the return if the session is `isLogged` or `notLogged` or `browserClose` or
 | `deviceNotConnected`    | Chat not available because the phone is disconnected `(Trying to connect to the phone)`                                                                        |
 | `serverWssNotConnected` | The address wss was not found!                                                                                                                                 |
 | `noOpenBrowser`         | It was not found in the browser, or some command is missing in args                                                                                            |
-
+| `initBrowser`           | Starting the browser                                                                                                                                           |
+| `openBrowser`           | The browser has been successfully opened!                                                                                                                      |
+| `connectBrowserWs`      | Connection with BrowserWs successfully done!                                                                                                                   |
+| `initWhatsapp`          | Starting whatsapp!                                                                                                                                             |
+| `erroPageWhatsapp`      | Error accessing whatsapp page                                                                                                                                  |
+| `successPageWhatsapp`   | Page Whatsapp successfully accessed                                                                                                                            |
+| `waitForLogin`          | Waiting for login verification!                                                                                                                                |
+| `waitChat`              | Waiting for the chat to load                                                                                                                                   |
+| `successChat`           | Chat successfully loaded!                                                                                                                                      | 
 ```javascript
 const venom = require('venom-bot');
 venom
@@ -253,7 +261,7 @@ venom
     undefined,
     (statusSession, session) => {
       console.log('Status Session: ', statusSession);
-      //return isLogged || notLogged || browserClose || qrReadSuccess || qrReadFail || autocloseCalled || desconnectedMobile || deleteToken || chatsAvailable || deviceNotConnected || serverWssNotConnected || noOpenBrowser
+      //return isLogged || notLogged || browserClose || qrReadSuccess || qrReadFail || autocloseCalled || desconnectedMobile || deleteToken || chatsAvailable || deviceNotConnected || serverWssNotConnected || noOpenBrowser || initBrowser || openBrowser || connectBrowserWs || initWhatsapp || erroPageWhatsapp || successPageWhatsapp || waitForLogin || waitChat || successChat
       //Create session wss return "serverClose" case server for close
       console.log('Session name: ', session);
     },
